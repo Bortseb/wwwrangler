@@ -3,7 +3,7 @@
     const frame = await import(script);
     browser.runtime.onMessage.addListener((msg) => {
         switch (msg.cmd) {
-            case "ghost":
+            case "create-ghost":
                 let page = {
                     title: document.title,
                     story: [{
