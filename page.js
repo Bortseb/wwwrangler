@@ -1,14 +1,21 @@
-// listen for command from bg.js, when you hear it, send a command to fedwiki to creat ghost
-// import * as frame from './frame.js'
-
 (async () => {
-    const src = chrome.runtime.getURL("./frame.js");
-    const frame = await import(src);
-    //contentMain.main();
+    const script = chrome.runtime.getURL("./frame.js");
+    const frame = await import(script);
     browser.runtime.onMessage.addListener((msg) => {
-        console.log("received msg!")
-        let page = { title: 'Salem Confluence', story: [{ type: 'map', text: '45,-123' }] }
-        frame.open(page)
+        switch (msg.cmd) {
+            case "ghost":
+                let page = {
+                    title: document.title,
+                    story: [{
+                        type: 'paragraph',
+                        text: `[${window.location.href} ${window.location.href}]`
+                    }]
+                }
+                frame.open(page)
+                break;
+            default:
+                console.log("Default case used for (msg) in page.js", msg);
+        }
     });
 })();
 

@@ -1,24 +1,16 @@
 {
-  "name": "wwwwrangler",
-  "description": "Wrangle data from any web page",
+  "name": "wwwrangler",
+  "description": "wrangle data from any web page",
   "homepage_url": "https://github.com/Bortseb/wwwrangler",
   "version": "0.1.0",
   "manifest_version": 2,
   "permissions": ["tabs", "<all_urls>"],
-  "browser_specific_settings": {
-    "gecko": {
-      "strict_min_version": "58.0a1"
-    }
-  },
-
-  "background": {
-    "scripts": ["background.js"]
-  },
-
+  "browser_specific_settings": { "gecko": { "strict_min_version": "58.0a1" } },
+  "background": { "scripts": ["background.js"] },
   "commands": {
-    "toggle-feature": {
+    "ghost": {
       "suggested_key": { "default": "Ctrl+Shift+Comma" },
-      "description": "Send command to federated wiki"
+      "description": "Create ghost page for current page {title: , url:}"
     }
   },
   "content_scripts": [
@@ -27,12 +19,5 @@
       "js": ["page.js"]
     }
   ],
-  "web_accessible_resources": [
-    "frame.js"
- ],
-
-  "options_ui": {
-    "page": "options.html",
-    "browser_style": true
-  }
+  "web_accessible_resources": ["frame.js"]
 }
