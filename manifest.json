@@ -10,7 +10,10 @@
     "default_title": "wwwrangler",
     "default_popup": "popup.html"
   },
-  "background": { "scripts": ["background.js"] },
+  "background": {
+    "page": "background.html",
+    "persistent": false
+  },
   "commands": {
     "create-ghost": {
       "suggested_key": { "default": "Shift+Alt+Comma" },

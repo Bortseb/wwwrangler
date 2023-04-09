@@ -3,15 +3,16 @@
     const frame = await import(script);
     browser.runtime.onMessage.addListener((msg) => {
         switch (msg.cmd) {
-            case "create-ghost":
-                let page = {
+            case "get-page":
+                browser.runtime.sendMessage({
+                    cmd: "queue-page",
+                    page: page,
                     title: document.title,
-                    story: [{
-                        type: 'paragraph',
-                        text: `[${window.location.href} ${window.location.href}]`
-                    }]
-                }
-                frame.open(page)
+                    url: window.location.href
+                });
+                break;
+            case "create-ghost":
+                frame.open(msg.page)
                 break;
             default:
                 console.log("Default case used for (msg) in page.js", msg);
