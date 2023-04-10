@@ -86,6 +86,11 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
       console.log("URL in tids!")
       browser.tabs.sendMessage(tabId, { cmd: "create-ghost", page: tids[url] })
       console.log("sent page =", tids[url])
+      delete tids[url] 
+      set("tids", tids)
+        .then()
+        .catch((err) => console.log("Clearing tids data failed!", err));
+
     }
   }
 });
