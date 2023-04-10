@@ -12,7 +12,11 @@
                 });
                 break;
             case "create-ghost":
-                frame.open(msg.page)
+                console.log("trying to create ghost (page)", msg.page)
+                setTimeout(() => {
+                    frame.open(msg.page)
+                }, 10000)
+
                 break;
             default:
                 console.log("Default case used for (msg) in page.js", msg);

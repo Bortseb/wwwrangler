@@ -5,11 +5,14 @@ var tids = {}
 async function awaitTids() {
   try {
     var getTids = await get("tids")
+    console.log("getTids= ", getTids)
+    tids = getTids
+    console.log("set tids= ", tids)
+    //return getTids
   } catch (err) {
     console.error(err)
     throw err
   }
-  tids = getTids
 }
 
 awaitTids()
@@ -27,14 +30,22 @@ browser.commands.onCommand.addListener((command) => {
         let url = tabs[0].url
         let page = {
           title: tabs[0].title,
-          url: url,
           story: [{
             type: 'paragraph',
             text: `[${url} ${url}]`
           }]
         }
-        tids[url] = page
-        browser.tabs.create({ url: url });
+        console.log("tids before wait in commands", tids)
+        awaitTids()
+        console.log("tids after wait in commands", tids)
+        tids['http://robert.wiki.openlearning.cc/view/welcome-visitors'] = page
+        console.log("tids after adding page", tids)
+        set("tids", tids)
+          .then()
+          .catch((err) => console.log("Setting tids failed!", err));
+        awaitTids()
+        console.log("tids after setting", tids)
+        browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' });
       });
       break;
     default:
@@ -43,26 +54,38 @@ browser.commands.onCommand.addListener((command) => {
 });
 
 
-// //Receiving commands from other scripts
-// browser.runtime.onMessage.addListener((msg, sender) => {
-//   switch (msg.cmd) {
-//     case "queue-page":
-//       tids[msg.url] = msg.page
-//       set("tids", tids)
-//         .then()
-//         .catch((err) => console.log("Setting tids failed!", err));
-//       break;
-//     default:
-//       console.log("Default case used for (msg) in background.js", msg);
-//   }
-// });
+//Receiving commands from other scripts
+browser.runtime.onMessage.addListener((msg, sender) => {
+  switch (msg.cmd) {
+    case "clear-data":
+      tids = {}
+      set("tids", {})
+        .then()
+        .catch((err) => console.log("Clearing tids data failed!", err));
+      awaitTids()
+      console.log("tids cleared?", tids)
+      break;
+    // case "queue-page":
+    //   tids[msg.url] = msg.page
+    //   set("tids", tids)
+    //     .then()
+    //     .catch((err) => console.log("Setting tids failed!", err));
+    //   break;
+    default:
+      console.log("Default case used for (msg) in background.js", msg);
+  }
+});
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
   console.log("tabs.onUpdated (changeInfo, tabInfo)", changeInfo, tabInfo);
-  if ("url" in changeInfo) {
-    let url = changeInfo.url
+  if ("status" in changeInfo && changeInfo.status === "complete") {
+    let url = tabInfo.url
+    awaitTids()
+    console.log("status complete! (url, tids)", url, tids)
     if (url in tids) {
-      browser.tabs.sendMessage(tabId, { cmd: "create-ghost", page: tids[url]  })
+      console.log("URL in tids!")
+      browser.tabs.sendMessage(tabId, { cmd: "create-ghost", page: tids[url] })
+      console.log("sent page =", tids[url])
     }
   }
 });
