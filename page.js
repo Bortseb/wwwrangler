@@ -15,7 +15,7 @@
                 console.log("trying to create ghost (page)", msg.page)
                 setTimeout(() => {
                     frame.open(msg.page)
-                }, 10000)
+                }, 3000)
 
                 break;
             default:
@@ -24,3 +24,6 @@
     });
 })();
 
+window.onload = (event) => {
+    console.log("Window loaded. (event)", event)
+}

@@ -5,6 +5,7 @@ var tids = {}
 async function awaitTids() {
   try {
     var getTids = await get("tids")
+    if (getTids === undefined) {getTids = {}}
     console.log("getTids= ", getTids)
     tids = getTids
     console.log("set tids= ", tids)
