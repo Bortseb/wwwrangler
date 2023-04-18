@@ -1,5 +1,5 @@
 (async () => {
-    const script = chrome.runtime.getURL("./frame.js");
+    const script = browser.runtime.getURL("./frame.js");
     const frame = await import(script);
     browser.runtime.onMessage.addListener((msg) => {
         switch (msg.cmd) {

@@ -1,7 +1,7 @@
 document.addEventListener("click", (e) => {
   switch (e.target.id) {
     case "create-ghost":
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         let url = 'http://robert.wiki.openlearning.cc/view/welcome-visitors'
         let page = {
           title: "test",

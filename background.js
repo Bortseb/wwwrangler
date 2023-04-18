@@ -7,12 +7,12 @@ console.log("tids= ", tids)
 browser.commands.onCommand.addListener((command) => {
   switch (command) {
     case "create-ghost":
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         browser.tabs.sendMessage(tabs[0].id, { cmd: "create-ghost" })
       });
       break;
     case "wrangle-page":
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         let url = tabs[0].url
         let page = {
           title: tabs[0].title,
