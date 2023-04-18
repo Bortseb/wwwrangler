@@ -3,14 +3,6 @@
     const frame = await import(script);
     browser.runtime.onMessage.addListener((msg) => {
         switch (msg.cmd) {
-            case "get-page":
-                browser.runtime.sendMessage({
-                    cmd: "queue-page",
-                    page: page,
-                    title: document.title,
-                    url: window.location.href
-                });
-                break;
             case "create-ghost":
                 console.log("trying to create ghost (page)", msg.page)
                 setTimeout(() => {
