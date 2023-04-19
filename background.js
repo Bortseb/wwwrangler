@@ -24,7 +24,7 @@ browser.commands.onCommand.addListener((command) => {
         tids['http://robert.wiki.openlearning.cc/view/welcome-visitors'] = page
         console.log("tids after adding page", tids)
         set("tids", tids).catch((err) => console.log("Setting tids failed!", err));
-        get('tids').then((val) => console.log("Get tids=", val));
+        
         browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' });
       });
       break;

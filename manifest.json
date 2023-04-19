@@ -3,9 +3,10 @@
   "description": "wrangle data from any web page",
   "homepage_url": "https://github.com/Bortseb/wwwrangler",
   "version": "0.1.0",
-  "manifest_version": 2,
-  "permissions": ["tabs", "<all_urls>"],
-  "browser_action": {
+  "manifest_version": 3,
+  "permissions": ["tabs"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
     "browser_style": true,
     "default_title": "wwwrangler",
     "default_popup": "popup.html"
@@ -30,6 +31,8 @@
       "js": ["browser-polyfill.min.js", "page.js"]
     }
   ],
-  "web_accessible_resources": ["frame.js"],
+  "web_accessible_resources": [
+    { "resources": ["frame.js"], "matches": ["<all_urls>"] }
+  ],
   "browser_specific_settings": { "gecko": { "strict_min_version": "58.0a1" } }
 }
