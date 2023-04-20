@@ -12,8 +12,7 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": ["service_worker.js"],
-    "persistent": false,
+    "service_worker": "service_worker.js",
     "type": "module"
   },
   "commands": {

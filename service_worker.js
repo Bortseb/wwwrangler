@@ -1,4 +1,5 @@
-import { get, set, update, clear } from "./idb-keyval@6.2.0-dist-index.js";
+import "./browser-polyfill.min.js";
+import { get, set } from "./idb-keyval@6.2.0-dist-index.js";
 
 var tids = await get("tids")
 if (tids === undefined) { tids = {} }
@@ -24,7 +25,7 @@ browser.commands.onCommand.addListener((command) => {
         tids['http://robert.wiki.openlearning.cc/view/welcome-visitors'] = page
         console.log("tids after adding page", tids)
         set("tids", tids).catch((err) => console.log("Setting tids failed!", err));
-        
+
         browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' });
       });
       break;
