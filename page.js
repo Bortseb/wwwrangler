@@ -1,6 +1,14 @@
 (async () => {
     const script = browser.runtime.getURL("./frame.js");
     const frame = await import(script);
+
+    browser.runtime.sendMessage({
+        cmd: "click",
+        source: windowLocation,
+        target: linkCLicked,
+        type: "same tab",
+      });
+    
     browser.runtime.onMessage.addListener((msg) => {
         switch (msg.cmd) {
             case "create-ghost":
@@ -14,8 +22,5 @@
                 console.log("Default case used for (msg) in page.js", msg);
         }
     });
+    
 })();
-
-window.onload = (event) => {
-    console.log("Window loaded. (event)", event)
-}

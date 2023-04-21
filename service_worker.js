@@ -1,12 +1,26 @@
 import "./browser-polyfill.min.js";
 import { get, set } from "./idb-keyval@6.2.0-dist-index.js";
+console.log("browser.tabs 1= ", browser.tabs)
 
 var tids = await get("tids")
 if (tids === undefined) { tids = {} }
 console.log("tids= ", tids)
 
-browser.commands.onCommand.addListener((command) => {
-  switch (command) {
+async function inject(tab) {
+  console.log("trying to inject script")
+  console.log("browser.tabs 2= ", browser.tabs)
+  try {
+    await browser.tabs.executeScript(tab.id, {
+      file: "./page.js",
+      allFrames: true,
+    });
+  } catch (err) {
+    console.error(`failed to execute script: ${err}`);
+  }
+}
+
+browser.commands.onCommand.addListener((msg, sender, response) => {
+  switch (msg) {
     case "create-ghost":
       browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         browser.tabs.sendMessage(tabs[0].id, { cmd: "create-ghost" })
@@ -26,11 +40,16 @@ browser.commands.onCommand.addListener((command) => {
         console.log("tids after adding page", tids)
         set("tids", tids).catch((err) => console.log("Setting tids failed!", err));
 
-        browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' });
+        browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' }).then((tab) => {
+          inject(tab)
+        });
       });
       break;
+    case "injected":
+
+      break;
     default:
-      console.log("Default case used for (command) in background.js", command);
+      console.log("Default case used for (msg) in background.js", msg);
   }
 });
 
@@ -50,18 +69,18 @@ browser.runtime.onMessage.addListener((msg, sender) => {
   }
 });
 
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
-  if ("status" in changeInfo && changeInfo.status === "complete") {
-    let url = tabInfo.url
+// browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
+//   if ("status" in changeInfo && changeInfo.status === "complete") {
+//     let url = tabInfo.url
 
-    console.log("status complete! (url, tids)", url, tids)
-    if (url in tids) {
-      console.log("URL in tids!")
-      browser.tabs.sendMessage(tabId, { cmd: "create-ghost", page: tids[url] })
-      console.log("sent page =", tids[url])
-      delete tids[url]
-      set("tids", tids).catch((err) => console.log("Clearing tids data failed!", err));
-      console.log("tids after creating ghost, and delete", tids)
-    }
-  }
-});
+//     console.log("status complete! (url, tids)", url, tids)
+//     if (url in tids) {
+//       console.log("URL in tids!")
+//       browser.tabs.sendMessage(tabId, { cmd: "create-ghost", page: tids[url] })
+//       console.log("sent page =", tids[url])
+//       delete tids[url]
+//       set("tids", tids).catch((err) => console.log("Clearing tids data failed!", err));
+//       console.log("tids after creating ghost, and delete", tids)
+//     }
+//   }
+// });
