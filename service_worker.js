@@ -19,8 +19,8 @@ async function inject(tab) {
   }
 }
 
-browser.commands.onCommand.addListener((msg, sender, response) => {
-  switch (msg) {
+browser.commands.onCommand.addListener((command) => {
+  switch (command) {
     case "create-ghost":
       browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         browser.tabs.sendMessage(tabs[0].id, { cmd: "create-ghost" })
@@ -42,20 +42,18 @@ browser.commands.onCommand.addListener((msg, sender, response) => {
 
         browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' }).then((tab) => {
           inject(tab)
+          browser.tabs.sendMessage(tab.id, { cmd: "create-ghost", page: tids[url] })
         });
       });
       break;
-    case "injected":
-
-      break;
     default:
-      console.log("Default case used for (msg) in background.js", msg);
+      console.log("Default case used for (command) in background.js", command);
   }
 });
 
 
 //Receiving commands from other scripts
-browser.runtime.onMessage.addListener((msg, sender) => {
+browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   switch (msg.cmd) {
     case "clear-data":
       tids = {}
@@ -63,7 +61,6 @@ browser.runtime.onMessage.addListener((msg, sender) => {
 
       console.log("tids cleared?", tids)
       break;
-
     default:
       console.log("Default case used for (msg) in background.js", msg);
   }
