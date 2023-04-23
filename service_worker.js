@@ -1,84 +1,42 @@
 import "./browser-polyfill.min.js";
-import { get, set } from "./idb-keyval@6.2.0-dist-index.js";
+// import { get, set } from "./idb-keyval@6.2.0-dist-index.js";
 
-var tids = await get("tids")
-if (tids === undefined) { tids = {} }
-console.log("tids= ", tids)
+function wranglePage() {
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+    let url = tabs[0].url
+    let page = {
+      title: tabs[0].title,
+      story: [{
+        type: 'paragraph',
+        text: `[${url} ${url}]`
+      }]
+    }
 
-async function inject(tabID, url) {
-  console.log("trying to inject script")
-  console.log("browser.tabs 2= ", browser.tabs)
-  let fail = false
-  let test;
-  let success = false;
-  try {
-    test = await browser.tabs.executeScript(tabID, {
-      file: "./browser-polyfill.min.js",
-      allFrames: true,
-    }).then(() => {
-      browser.tabs.executeScript(tabID, {
-        file: "./page.js",
+    browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' }).then((tab) => {
+      browser.tabs.executeScript(tab.id, {
+        file: "./browser-polyfill.min.js",
         allFrames: true,
       }).then(() => {
-        console.log("injection worked!")
-        success = true;
-        console.log("success after injection then", success)
-        console.log("trying to send message to tabID=", tabID)
-        console.log("What is url?",url)
-        browser.tabs.sendMessage(tabID, { cmd: "create-ghost", page: tids[url] })
-        console.log("sent page =", tids[url])
-        delete tids[url]
-        set("tids", tids).catch((err) => console.log("Clearing tids data failed!", err));
-        console.log("tids after creating ghost, and delete", tids)
+        browser.tabs.executeScript(tab.id, {
+          file: "./page.js",
+          allFrames: true,
+        }).then(() => {
+          browser.tabs.sendMessage(tab.id, { cmd: "create-ghost", page: page })
+        }, (err) => {
+          console.log("Error injecting page.js", err)
+        })
       }, (err) => {
-        console.log("Error injecting page.js", err)
-        fail = true
-      })
-      console.log("pOLYFIL JUST HAPPENED ABOVE ME")
-    }, (err) => {
-      console.log("error injecting plyfill (err)", err)
-      fail = true
-    }
-    );
-    console.log("test right after wait", test)
-    console.log("injection seems to have worked")
-  } catch (err) {
-    console.error(`failed to execute script: ${err}`);
-    fail = true
-  }
-  console.log("test await", test)
-  console.log("success after try block", success)
-
+        console.log("error injecting polyfill (err)", err)
+      }
+      );
+    });
+  });
 }
 
 browser.commands.onCommand.addListener((command) => {
   switch (command) {
-    case "create-ghost":
-      browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        browser.tabs.sendMessage(tabs[0].id, { cmd: "create-ghost" })
-      });
-      break;
     case "wrangle-page":
-      browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        let url = tabs[0].url
-        let page = {
-          title: tabs[0].title,
-          story: [{
-            type: 'paragraph',
-            text: `[${url} ${url}]`
-          }]
-        }
-        tids['http://robert.wiki.openlearning.cc/view/welcome-visitors'] = page
-        console.log("tids after adding page", tids)
-        set("tids", tids).catch((err) => console.log("Setting tids failed!", err));
-
-        browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' }).then((tab) => {
-          console.log("tab created: (tab.id)", tab.id)
-          console.log("Lets try inject content script")
-          let success = inject(tab.id, 'http://robert.wiki.openlearning.cc/view/welcome-visitors')
-          console.log("success after tab create=?", success)
-        });
-      });
+      wranglePage()
       break;
     default:
       console.log("Default case used for (command) in background.js", command);
@@ -89,31 +47,10 @@ browser.commands.onCommand.addListener((command) => {
 //Receiving commands from other scripts
 browser.runtime.onMessage.addListener((msg, sender) => {
   switch (msg.cmd) {
-    case "clear-data":
-      tids = {}
-      set("tids", {}).catch((err) => console.log("Clearing tids data failed!", err));
-
-      console.log("tids cleared?", tids)
+    case "wrangle-page":
+      wranglePage()
       break;
-
     default:
       console.log("Default case used for (msg) in background.js", msg);
   }
 });
-
-// browser.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
-//   if ("status" in changeInfo && changeInfo.status === "complete") {
-//     let url = tabInfo.url
-
-//     console.log("status complete! (url, tids)", url, tids)
-//     if (url in tids) {
-//       console.log("URL in tids!")
-//       console.log("trying to send message to tab.id=", tabId)
-//       browser.tabs.sendMessage(tabId, { cmd: "create-ghost", page: tids[url] })
-//       console.log("sent page =", tids[url])
-//       delete tids[url]
-//       set("tids", tids).catch((err) => console.log("Clearing tids data failed!", err));
-//       console.log("tids after creating ghost, and delete", tids)
-//     }
-//   }
-// });

@@ -7,6 +7,7 @@
       switch (msg.cmd) {
           case "create-ghost":
               console.log("trying to create ghost (page)", msg.page)
+              
               setTimeout(() => {
                   frame.open(msg.page)
               }, 3000)

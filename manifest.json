@@ -16,10 +16,6 @@
     "type": "module"
   },
   "commands": {
-    "create-ghost": {
-      "suggested_key": { "default": "Shift+Alt+Comma" },
-      "description": "Create ghost in wiki"
-    },
     "wrangle-page": {
       "suggested_key": { "default": "Ctrl+Shift+Comma" },
       "description": "Wrangle this page into wiki {title: , url:}"
