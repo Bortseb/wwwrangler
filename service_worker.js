@@ -9,6 +9,7 @@ console.log("tids= ", tids)
 async function inject(tab) {
   console.log("trying to inject script")
   console.log("browser.tabs 2= ", browser.tabs)
+  let error = false
   try {
     await browser.tabs.executeScript(tab.id, {
       file: "./page.js",
@@ -16,35 +17,49 @@ async function inject(tab) {
     });
   } catch (err) {
     console.error(`failed to execute script: ${err}`);
+    error = true
   }
+  if (!error) return true;
+  else return false;
+}
+
+function createGhost() {
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+    browser.tabs.sendMessage(tabs[0].id, { cmd: "create-ghost" })
+  });
+}
+
+function wranglePage() {
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+    let url = tabs[0].url
+    let page = {
+      title: tabs[0].title,
+      story: [{
+        type: 'paragraph',
+        text: `[${url} ${url}]`
+      }]
+    }
+    tids['http://robert.wiki.openlearning.cc/view/welcome-visitors'] = page
+    console.log("tids after adding page", tids)
+    set("tids", tids).catch((err) => console.log("Setting tids failed!", err));
+
+    browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' }).then((tab) => {
+      let injected = inject(tab)
+      console.log("injected succes?", injected)
+      if (injected) {
+        browser.tabs.sendMessage(tab.id, { cmd: "create-ghost", page: tids[url] })
+      }
+    });
+  });
 }
 
 browser.commands.onCommand.addListener((command) => {
   switch (command) {
     case "create-ghost":
-      browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        browser.tabs.sendMessage(tabs[0].id, { cmd: "create-ghost" })
-      });
+      createGhost()
       break;
     case "wrangle-page":
-      browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        let url = tabs[0].url
-        let page = {
-          title: tabs[0].title,
-          story: [{
-            type: 'paragraph',
-            text: `[${url} ${url}]`
-          }]
-        }
-        tids['http://robert.wiki.openlearning.cc/view/welcome-visitors'] = page
-        console.log("tids after adding page", tids)
-        set("tids", tids).catch((err) => console.log("Setting tids failed!", err));
-
-        browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' }).then((tab) => {
-          inject(tab)
-          browser.tabs.sendMessage(tab.id, { cmd: "create-ghost", page: tids[url] })
-        });
-      });
+      wranglePage()
       break;
     default:
       console.log("Default case used for (command) in background.js", command);
@@ -55,6 +70,12 @@ browser.commands.onCommand.addListener((command) => {
 //Receiving commands from other scripts
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   switch (msg.cmd) {
+    case "create-ghost":
+      createGhost()
+      break;
+    case "wrangle-page":
+      wranglePage()
+      break;
     case "clear-data":
       tids = {}
       set("tids", {}).catch((err) => console.log("Clearing tids data failed!", err));

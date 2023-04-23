@@ -25,12 +25,6 @@
       "description": "Wrangle this page into wiki {title: , url:}"
     }
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["browser-polyfill.min.js"]
-    }
-  ],
   "web_accessible_resources": ["frame.js"],
   "browser_specific_settings": { "gecko": { "strict_min_version": "112.0.1" } }
 }
