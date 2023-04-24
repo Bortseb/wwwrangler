@@ -26,7 +26,7 @@ function wranglePage() {
           console.log("Error injecting page.js", err)
         })
       }, (err) => {
-        console.log("error injecting polyfill (err)", err)
+        console.log("error injecting polyfill:", err)
       }
       );
     });
