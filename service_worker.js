@@ -12,7 +12,8 @@ function wranglePage() {
       }]
     }
 
-    browser.tabs.create({ url: 'http://robert.wiki.openlearning.cc/view/welcome-visitors' }).then((tab) => {
+    let site = "http://robert.wiki.openlearning.cc/view/welcome-visitors"
+    browser.tabs.create({ url: site }).then((tab) => {
       browser.tabs.executeScript(tab.id, {
         file: "./browser-polyfill.min.js",
         allFrames: true,
@@ -21,7 +22,7 @@ function wranglePage() {
           file: "./page.js",
           allFrames: true,
         }).then(() => {
-          browser.tabs.sendMessage(tab.id, { cmd: "create-ghost", page: page })
+          browser.tabs.sendMessage(tab.id, { cmd: "create-ghost", page: page, url: site })
         }, (err) => {
           console.log("Error injecting page.js", err)
         })
