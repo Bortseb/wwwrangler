@@ -22,7 +22,10 @@ function wranglePage() {
           file: "./page.js",
           allFrames: true,
         }).then(() => {
-          browser.tabs.sendMessage(tab.id, { cmd: "create-ghost", page: page, url: site })
+          browser.tabs.sendMessage(tab.id, {
+            cmd: "create-ghost", page: page, url: site
+          }).catch((err) =>
+            console.log("error from sendMessage", err))
         }, (err) => {
           console.log("Error injecting page.js", err)
         })
