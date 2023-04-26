@@ -1,0 +1,36 @@
+{
+  "name": "wwwrangler",
+  "description": "wrangle data from any web page",
+  "homepage_url": "https://github.com/Bortseb/wwwrangler",
+  "version": "0.1.0",
+  "manifest_version": 2,
+  "permissions": ["tabs", "<all_urls>"],
+  "browser_action": {
+    "browser_style": true,
+    "default_title": "wwwrangler",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "page": "background.html",
+    "persistent": false
+  },
+  "commands": {
+    "create-ghost": {
+      "suggested_key": { "default": "Shift+Alt+Comma" },
+      "description": "Create ghost in wiki"
+    },
+    "wrangle-page": {
+      "suggested_key": { "default": "Ctrl+Shift+Comma" },
+      "description": "Wrangle this page into wiki {title: , url:}"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["page.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": ["frame.js"],
+  "browser_specific_settings": { "gecko": { "strict_min_version": "58.0a1" } }
+}
