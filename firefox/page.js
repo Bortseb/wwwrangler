@@ -20,6 +20,39 @@ async function asyncTimeout(ms) {
           else break
         }
         break;
+      case "JSON-to-HSC":
+        console.log("in the HSC module (document)", document)
+        await asyncTimeout(3000)
+
+        var actualCode =
+          `
+            console.log("this is in the page!")
+            let json = {
+              "nodes": [
+                {
+                  "type": "Magic",
+                  "in": [],
+                  "out": [],
+                  "props": {
+                    "name": "${msg.title}"
+                  }
+                }
+              ],
+              "rels": []
+            };
+            console.log("json",json)
+            window.dispatchEvent(new CustomEvent('target', {detail:json}));
+          `;
+
+        var script = document.createElement('script');
+        script.textContent = actualCode;
+        (document.head || document.documentElement).appendChild(script);
+        script.remove();
+        1
+        break;
+      case "JSON-to-wiki":
+
+        break;
       default:
         console.log("Default case used for (msg) in page.js", msg);
     }
