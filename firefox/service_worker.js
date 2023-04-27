@@ -45,6 +45,7 @@ function jsonToHSC() {
   browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     console.log('tabs', tabs)
     let title = tabs[0].title
+    let url = tabs[0].url
 
     let site = "http://hsc.fed.wiki/assets/home/index.html"
     browser.tabs.create({ url: site }).then((tab) => {
@@ -57,7 +58,7 @@ function jsonToHSC() {
           allFrames: true,
         }).then(() => {
           browser.tabs.sendMessage(tab.id, {
-            cmd: "JSON-to-HSC", title: title
+            cmd: "JSON-to-HSC", title: title, url: url
           }).catch((err) =>
             console.log("error from sendMessage", err))
         }, (err) => {

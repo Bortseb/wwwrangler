@@ -34,7 +34,8 @@ async function asyncTimeout(ms) {
                   "in": [],
                   "out": [],
                   "props": {
-                    "name": "${msg.title}"
+                    "name": "${msg.title}",
+                    "url": "${msg.url}"
                   }
                 }
               ],
