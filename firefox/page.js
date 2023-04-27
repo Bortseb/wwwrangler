@@ -21,16 +21,15 @@ async function asyncTimeout(ms) {
         }
         break;
       case "JSON-to-HSC":
-        console.log("in the HSC module (document)", document)
+
         await asyncTimeout(3000)
 
-        var actualCode =
+        var code =
           `
-            console.log("this is in the page!")
             let json = {
               "nodes": [
                 {
-                  "type": "Magic",
+                  "type": "Hyperlink",
                   "in": [],
                   "out": [],
                   "props": {
@@ -41,15 +40,15 @@ async function asyncTimeout(ms) {
               ],
               "rels": []
             };
-            console.log("json",json)
+
             window.dispatchEvent(new CustomEvent('target', {detail:json}));
           `;
 
         var script = document.createElement('script');
-        script.textContent = actualCode;
+        script.textContent = code;
         (document.head || document.documentElement).appendChild(script);
         script.remove();
-        1
+
         break;
       case "JSON-to-wiki":
 
