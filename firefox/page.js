@@ -26,23 +26,23 @@ async function asyncTimeout(ms) {
 
         var code =
           `
-            let json = {
-              "nodes": [
-                {
-                  "type": "Hyperlink",
-                  "in": [],
-                  "out": [],
-                  "props": {
-                    "name": "${msg.title}",
-                    "url": "${msg.url}"
-                  }
-                }
-              ],
-              "rels": []
-            };
-
-            window.dispatchEvent(new CustomEvent('target', {detail:json}));
-          `;
+        let json = {
+          "nodes": [
+            {
+              "type": "Hyperlink",
+              "in": [],
+              "out": [],
+              "props": {
+                "name": "${msg.title}",
+                "url": "${msg.url}"
+              }
+            }
+          ],
+          "rels": []
+        };      
+        
+        window.dispatchEvent(new CustomEvent('target', {detail:json}));
+        `;
 
         var script = document.createElement('script');
         script.textContent = code;
@@ -56,7 +56,7 @@ async function asyncTimeout(ms) {
 
         var code =
           `
-        let data = {
+        let json = {
           "title": "Example JSON Template",
           "story": [
             {
@@ -99,10 +99,41 @@ async function asyncTimeout(ms) {
             }
           ]
         };
+        console.log("json=",json)
+        function FakeDataTransfer(file) {
+          this.dropEffect = 'all';
+          this.effectAllowed = 'all';
+          this.items = [];
+          this.bubbles = true
+          this.types = ['Files'];
+          this.getData = function () {
+            
+            return file;
+          };
+          this.files = [file];
+        };
+        
+        var string = JSON.stringify(json, null, 2)
+        console.log("string=",string)
+        //var blob = new Blob([string], { type: 'application/json' });
+        //console.log("blob",blob)
+        var file = new File([string], "file.json", {
+          type: "application/json",
+          lastModified: new Date().getTime()
+        });
+        console.log("file=",file)
+        var fakeDropEvent = new DragEvent('drop');
+        Object.defineProperty(fakeDropEvent, 'dataTransfer', {
+          value: new FakeDataTransfer(file)
+        });
+        console.log("fakeDropEvent",fakeDropEvent)
+        document.body.dispatchEvent(fakeDropEvent);
 
-        let dropEvent = new CustomEvent('drop')
-        dropEvent.dataTransfer.setData('application/ld+json', JSON.stringify(data));
-        window.dispatchEvent(dropEvent);
+
+
+        // let dropEvent = new CustomEvent('drop')
+        // dropEvent.dataTransfer.setData('application/ld+json', JSON.stringify(data));
+        // window.dispatchEvent(dropEvent);
         `;
 
         var script = document.createElement('script');
