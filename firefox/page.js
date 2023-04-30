@@ -122,7 +122,11 @@ async function asyncTimeout(ms) {
           lastModified: new Date().getTime()
         });
         console.log("file=",file)
-        var fakeDropEvent = new DragEvent('drop');
+        var fakeDropEvent = new DragEvent('drop', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
         Object.defineProperty(fakeDropEvent, 'dataTransfer', {
           value: new FakeDataTransfer(file)
         });
