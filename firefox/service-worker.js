@@ -21,7 +21,7 @@ function wranglePage() {
         })
           .then(() => {
             browser.tabs.executeScript(tab.id, {
-              file: "./page.js",
+              file: "./content-script.js",
               allFrames: true,
             })
               .then(() => {
@@ -31,7 +31,7 @@ function wranglePage() {
                   .catch((err) =>
                     console.log("error from sendMessage", err))
               }, (err) => {
-                console.log("Error injecting page.js", err)
+                console.log("Error injecting content-script.js", err)
               })
           }, (err) => {
             console.log("error injecting polyfill", err)
@@ -54,7 +54,7 @@ function jsonToHSC() {
         allFrames: true,
       }).then(() => {
         browser.tabs.executeScript(tab.id, {
-          file: "./page.js",
+          file: "./content-script.js",
           allFrames: true,
         }).then(() => {
           browser.tabs.sendMessage(tab.id, {
@@ -62,7 +62,7 @@ function jsonToHSC() {
           }).catch((err) =>
             console.log("error from sendMessage", err))
         }, (err) => {
-          console.log("Error injecting page.js", err)
+          console.log("Error injecting content-script.js", err)
         })
       }, (err) => {
         console.log("error injecting polyfill:", err)
