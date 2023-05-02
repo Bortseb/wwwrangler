@@ -8,10 +8,6 @@ document.addEventListener("click", (e) => {
       browser.runtime.sendMessage({ cmd: "JSON-to-HSC" })
       window.close()
       break
-    case "JSON-to-wiki":
-      browser.runtime.sendMessage({ cmd: "JSON-to-wiki" })
-      window.close()
-      break
     default:
       console.log("Default case used for click on popup", e.target.id)
   }
