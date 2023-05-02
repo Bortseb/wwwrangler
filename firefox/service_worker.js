@@ -12,7 +12,7 @@ function wranglePage() {
       }]
     }
 
-    let site = "http://robert.wiki.openlearning.cc/view/welcome-visitors"
+    let site = "http://robert.wiki.openlearning.cc/view/welcome-visitors/view/about-frame-plugin"
     browser.tabs.create({ url: site })
       .then((tab) => {
         browser.tabs.executeScript(tab.id, {
