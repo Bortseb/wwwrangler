@@ -72,38 +72,6 @@ function jsonToHSC() {
   });
 }
 
-function jsonToWiki() {
-  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-    console.log('tabs', tabs)
-    let title = tabs[0].title
-    let url = tabs[0].url
-
-    let site = "http://robert.wiki.openlearning.cc/view/welcome-visitors"
-    browser.tabs.create({ url: site }).then((tab) => {
-      browser.tabs.executeScript(tab.id, {
-        file: "./browser-polyfill.min.js",
-        allFrames: true,
-      }).then(() => {
-        browser.tabs.executeScript(tab.id, {
-          file: "./page.js",
-          allFrames: true,
-        }).then(() => {
-          browser.tabs.sendMessage(tab.id, {
-            cmd: "JSON-to-wiki", title: title, url: url
-          }).catch((err) =>
-            console.log("error from sendMessage", err))
-        }, (err) => {
-          console.log("Error injecting page.js", err)
-        })
-      }, (err) => {
-        console.log("error injecting polyfill:", err)
-      }
-      );
-    });
-  });
-}
-
-
 browser.commands.onCommand.addListener((command) => {
   switch (command) {
     case "wrangle-page":
@@ -123,9 +91,6 @@ browser.runtime.onMessage.addListener((msg, sender) => {
       break;
     case "JSON-to-HSC":
       jsonToHSC()
-      break;
-    case "JSON-to-wiki":
-      jsonToWiki()
       break;
     default:
       console.log("Default case used for (msg) in background.js", msg);
