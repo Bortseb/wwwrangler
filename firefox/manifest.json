@@ -21,6 +21,5 @@
       "description": "Wrangle this page into wiki {title: , url:}"
     }
   },
-  "web_accessible_resources": ["frame.js"],
-  "browser_specific_settings": { "gecko": { "strict_min_version": "112.0.1" } }
+  "web_accessible_resources": ["frame.js"]  
 }
