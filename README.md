@@ -4,14 +4,14 @@
 This extension so far is mostly just clippings from [mdn / webextensions-examples](https://github.com/mdn/webextensions-examples) and other example code in the [MDN Web Docs](https://developer.mozilla.org/) combined with learning and using the [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/) command-line tool that lets you easily test and develop extensions, like on any of the examples in the repo above, in a private browser isolated from your other Firefox if you already use it.
 
 ## Install
-Firefox: [https://addons.mozilla.org/en-US/firefox/addon/wwwrangler/](https://addons.mozilla.org/en-US/firefox/addon/wwwrangler/)
-Chrome: pending...
+* Firefox: [https://addons.mozilla.org/en-US/firefox/addon/wwwrangler/](https://addons.mozilla.org/en-US/firefox/addon/wwwrangler/)
+* Chrome: pending...
 
 ## test / develop
 
 install web-ext, clone this repo, navigate to its folder in terminal and run `web-ext run`
 
-Other useful resources:
+## Other resources:
 * [https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions)
 
  This extension from this code:
