@@ -1,7 +1,30 @@
 import "./browser-polyfill.min.js";
 import { get, set } from "./idb-keyval@6.2.0-dist-index.js";
 
-function wranglePage() {
+var sites = [];
+(async () => {
+  try {
+    var getSites = await get("sites")
+  } catch (err) {
+    console.error(err)
+    throw err;
+  }
+  sites = getSites
+})();
+
+var defaultSite = "";
+(async () => {
+  try {
+    var getDefaultSite = await get("defaultSite")
+  } catch (err) {
+    console.error(err)
+    throw err;
+  }
+  defaultSite = getDefaultSite
+})();
+
+
+function wranglePage(toSite) {
   browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     let url = tabs[0].url
     let page = {
@@ -12,8 +35,9 @@ function wranglePage() {
       }]
     }
 
-    let site = "http://robert.wiki.openlearning.cc/view/welcome-visitors/view/about-frame-plugin"
-    browser.tabs.create({ url: site })
+    toSite += "view/about-frame-plugin/"
+
+    browser.tabs.create({ url: toSite })
       .then((tab) => {
         browser.tabs.executeScript(tab.id, {
           file: "./browser-polyfill.min.js",
@@ -21,17 +45,17 @@ function wranglePage() {
         })
           .then(() => {
             browser.tabs.executeScript(tab.id, {
-              file: "./content-script.js",
+              file: "./load.js",
               allFrames: true,
             })
               .then(() => {
                 browser.tabs.sendMessage(tab.id, {
-                  cmd: "create-ghost", page: page, url: site
+                  cmd: "create-ghost", page: page, url: toSite
                 })
                   .catch((err) =>
                     console.log("error from sendMessage", err))
               }, (err) => {
-                console.log("Error injecting content-script.js", err)
+                console.log("Error injecting load.js", err)
               })
           }, (err) => {
             console.log("error injecting polyfill", err)
@@ -54,7 +78,7 @@ function jsonToHSC() {
         allFrames: true,
       }).then(() => {
         browser.tabs.executeScript(tab.id, {
-          file: "./content-script.js",
+          file: "./load.js",
           allFrames: true,
         }).then(() => {
           browser.tabs.sendMessage(tab.id, {
@@ -62,7 +86,7 @@ function jsonToHSC() {
           }).catch((err) =>
             console.log("error from sendMessage", err))
         }, (err) => {
-          console.log("Error injecting content-script.js", err)
+          console.log("Error injecting load.js", err)
         })
       }, (err) => {
         console.log("error injecting polyfill:", err)
@@ -75,7 +99,7 @@ function jsonToHSC() {
 browser.commands.onCommand.addListener((command) => {
   switch (command) {
     case "wrangle-page":
-      wranglePage()
+      wranglePage(defaultSite)
       break;
     default:
       console.log("Default case used for (command) in background.js", command);
@@ -84,10 +108,11 @@ browser.commands.onCommand.addListener((command) => {
 
 
 //Receiving commands from other scripts
-browser.runtime.onMessage.addListener((msg, sender) => {
+browser.runtime.onMessage.addListener((msg, sender, response) => {
   switch (msg.cmd) {
     case "wrangle-page":
-      wranglePage()
+      console.log("I am being asked to wrangle to (in msg evt listener)", msg.url)
+      wranglePage(msg.url)
       break;
     case "JSON-to-HSC":
       jsonToHSC()
@@ -95,4 +120,8 @@ browser.runtime.onMessage.addListener((msg, sender) => {
     default:
       console.log("Default case used for (msg) in background.js", msg);
   }
+});
+
+browser.browserAction.onClicked.addListener((tab) => {
+  browser.tabs.sendMessage(tab.id, { cmd: "togglePopup" }).catch((err) => console.log("error browserAction togglePopup", err));
 });

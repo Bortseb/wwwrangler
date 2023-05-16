@@ -1,0 +1,29 @@
+a {
+  margin: 10px;
+  display: inline-block;
+}
+
+button {
+  margin: 2px;
+}
+
+datalist,
+input {
+  margin: 2px;
+}
+
+
+#target {
+  margin: 10px;
+  border-style: solid;
+  border-width: 2px;
+}
+
+#sitesInput {
+  width: 300px;
+}
+
+body {
+  border-style: solid;
+  border-width: 2px;
+}

@@ -7,19 +7,24 @@
   "permissions": ["tabs", "<all_urls>"],
   "browser_action": {
     "browser_style": true,
-    "default_title": "wwwrangler",
-    "default_popup": "popup.html"
+    "default_title": "wwwrangler"
   },
   "background": {
     "scripts": ["service-worker.js"],
     "persistent": false,
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["browser-polyfill.min.js", "content-script.js"]
+    }
+  ],
   "commands": {
     "wrangle-page": {
       "suggested_key": { "default": "Ctrl+Shift+Comma" },
       "description": "Wrangle this page into wiki {title: , url:}"
     }
   },
-  "web_accessible_resources": ["frame.js"]  
+  "web_accessible_resources": ["frame.js", "popup.html"]
 }

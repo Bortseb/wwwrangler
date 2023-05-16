@@ -8,15 +8,16 @@ async function asyncTimeout(ms) {
   const script = browser.runtime.getURL("./frame.js");
   const frame = await import(script);
 
-  browser.runtime.onMessage.addListener(async (msg) => {
+  browser.runtime.onMessage.addListener(async (msg, sender, response) => {
     switch (msg.cmd) {
       case "create-ghost":
-        let windowLocation = "" + window.location;
-
         for (let i = 0; i < 50; i++) {
           await asyncTimeout(100)
-          windowLocation = "" + window.location;
-          if (windowLocation === msg.url) frame.open(msg.page)
+          windowLocation = new URL(window.location + "/")
+          console.log("windowLocation.href", windowLocation.href)
+          console.log("msg.url", msg.url)
+
+          if (windowLocation.href === msg.url) frame.open(msg.page)
           else break
         }
         break;
@@ -26,23 +27,23 @@ async function asyncTimeout(ms) {
 
         var code =
           `
-        let json = {
-          "nodes": [
-            {
-              "type": "Hyperlink",
-              "in": [],
-              "out": [],
-              "props": {
-                "name": "${msg.title}",
-                "url": "${msg.url}"
+          let json = {
+            "nodes": [
+              {
+                "type": "Hyperlink",
+                "in": [],
+                "out": [],
+                "props": {
+                  "name": "${msg.title}",
+                  "url": "${msg.url}"
+                }
               }
-            }
-          ],
-          "rels": []
-        };      
-        
-        window.dispatchEvent(new CustomEvent('target', {detail:json}));
-        `;
+            ],
+            "rels": []
+          };      
+          
+          window.dispatchEvent(new CustomEvent('target', {detail:json}));
+          `;
 
         var script = document.createElement('script');
         script.textContent = code;
