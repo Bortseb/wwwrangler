@@ -1,4 +1,4 @@
-import { get, set } from "./idb-keyval@6.2.0-dist-index.js"
+import { get } from "./idb-keyval@6.2.0-dist-index.js"
 
 var sites = await get("sites")
 if (sites === undefined) sites = []

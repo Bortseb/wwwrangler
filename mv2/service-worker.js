@@ -99,7 +99,12 @@ function jsonToHSC() {
 browser.commands.onCommand.addListener((command) => {
   switch (command) {
     case "wrangle-page":
+      defaultSite = get("defaultSite")
+      if (defaultSite !== ""){
       wranglePage(defaultSite)
+      } else {
+        //There isn't a default set to wrangle to
+      }
       break;
     default:
       console.log("Default case used for (command) in background.js", command);
@@ -111,7 +116,6 @@ browser.commands.onCommand.addListener((command) => {
 browser.runtime.onMessage.addListener((msg, sender, response) => {
   switch (msg.cmd) {
     case "wrangle-page":
-      console.log("I am being asked to wrangle to (in msg evt listener)", msg.url)
       wranglePage(msg.url)
       break;
     case "JSON-to-HSC":
