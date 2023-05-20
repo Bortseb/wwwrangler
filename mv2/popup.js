@@ -1,5 +1,8 @@
 import { get } from "./idb-keyval@6.2.0-dist-index.js"
 
+var script = browser.runtime.getURL("./interact.min.js");
+const test = await import(script);
+
 var sites = await get("sites")
 if (sites === undefined) sites = []
 
@@ -41,19 +44,18 @@ document.addEventListener("click", (e) => {
   switch (e.target.id) {
     case "wrangle-page":
       var inputBox = document.getElementById("sitesInput");
-      try {
-        if (inputBox.value === "") {
-          var url = new URL(defaultSite)
-        } else {
-          var url = new URL(inputBox.value)
-        }
-        if (url !== undefined) {
-          console.log("Url before wrangle is", url.href)
-          browser.runtime.sendMessage({ cmd: "wrangle-page", url: url.href })
-        }
-      } catch (err) {
-        throw err;
+
+      if (inputBox.value === "") {
+        var url = new URL(defaultSite)
+      } else {
+        var url = new URL(inputBox.value)
       }
+
+      if (url !== undefined) {
+        console.log("Url before wrangle is", url.href)
+        browser.runtime.sendMessage({ cmd: "wrangle-page", url: url.href })
+      }
+
       break
     case "JSON-to-HSC":
       browser.runtime.sendMessage({ cmd: "JSON-to-HSC" })
@@ -88,7 +90,6 @@ document.addEventListener("click", (e) => {
       }
       break
     case "clearSites":
-      var inputBox = document.getElementById("sitesInput");
       sites = []
       set("sites", sites).catch((err) => console.log("Setting sites failed! (clearSites)", err));
       defaultSite = ""

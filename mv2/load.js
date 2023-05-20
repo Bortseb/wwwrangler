@@ -2,15 +2,15 @@ async function asyncTimeout(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
-}
+};
 
 (async () => {
-  const script = browser.runtime.getURL("./frame.js");
-  const frame = await import(script);
-
   browser.runtime.onMessage.addListener(async (msg, sender, response) => {
     switch (msg.cmd) {
       case "create-ghost":
+        var script = browser.runtime.getURL("./frame.js");
+        const frame = await import(script);
+
         for (let i = 0; i < 50; i++) {
           await asyncTimeout(100)
           windowLocation = new URL(window.location + "/")
@@ -22,27 +22,26 @@ async function asyncTimeout(ms) {
         }
         break;
       case "JSON-to-HSC":
-
         await asyncTimeout(3000)
 
         var code =
           `
-          let json = {
-            "nodes": [
-              {
-                "type": "Hyperlink",
-                "in": [],
-                "out": [],
-                "props": {
-                  "name": "${msg.title}",
-                  "url": "${msg.url}"
+            let json = {
+              "nodes": [
+                {
+                  "type": "Hyperlink",
+                  "in": [],
+                  "out": [],
+                  "props": {
+                    "name": "${msg.title}",
+                    "url": "${msg.url}"
+                  }
                 }
-              }
-            ],
-            "rels": []
-          };      
-          
-          window.dispatchEvent(new CustomEvent('target', {detail:json}));
+              ],
+              "rels": []
+            };      
+            
+            window.dispatchEvent(new CustomEvent('target', {detail:json}));
           `;
 
         var script = document.createElement('script');
