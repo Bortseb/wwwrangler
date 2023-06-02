@@ -1,28 +1,11 @@
 import "./browser-polyfill.min.js";
 import { get, set } from "./idb-keyval@6.2.0-dist-index.js";
 
-var sites = [];
-(async () => {
-  try {
-    var getSites = await get("sites")
-  } catch (err) {
-    console.error(err)
-    throw err;
-  }
-  sites = getSites
-})();
+var sites = await get("sites")
+if (sites === undefined) sites = []
 
-var defaultSite = "";
-(async () => {
-  try {
-    var getDefaultSite = await get("defaultSite")
-  } catch (err) {
-    console.error(err)
-    throw err;
-  }
-  defaultSite = getDefaultSite
-})();
-
+var defaultSite = await get("defaultSite")
+if (defaultSite === undefined) defaultSite = ""
 
 function wranglePage(toSite) {
   browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
@@ -116,6 +99,7 @@ browser.commands.onCommand.addListener((command) => {
 browser.runtime.onMessage.addListener((msg, sender, response) => {
   switch (msg.cmd) {
     case "wrangle-page":
+      console.log("Received wrangle request in SW")
       wranglePage(msg.url)
       break;
     case "JSON-to-HSC":

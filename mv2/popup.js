@@ -1,8 +1,5 @@
 import { get } from "./idb-keyval@6.2.0-dist-index.js"
 
-var script = browser.runtime.getURL("./interact.min.js");
-const test = await import(script);
-
 var sites = await get("sites")
 if (sites === undefined) sites = []
 
@@ -10,6 +7,7 @@ var defaultSite = await get("defaultSite")
 if (defaultSite === undefined) defaultSite = ""
 
 var datalist = document.getElementById("sites");
+var sitesInput = document.getElementById("sitesInput");
 
 function loadSiteList() {
   for (const site of sites) {
@@ -40,33 +38,39 @@ function addSite() {
   }
 }
 
+function getTargetSite() {
+  if (sitesInput.value === "") {
+    if (defaultSite === "") {
+      alert("You don't have a default site set");
+      return false;
+    }
+    var url = new URL(defaultSite)
+  } else {
+    if (!sitesInput.checkValidity()) {
+      alert("The site you are trying to wrangle to is not a valid URL");
+      return false
+    }
+    var url = new URL(sitesInput.value)
+  }
+  return url
+}
+
 document.addEventListener("click", (e) => {
   switch (e.target.id) {
     case "wrangle-page":
-      var inputBox = document.getElementById("sitesInput");
-
-      if (inputBox.value === "") {
-        var url = new URL(defaultSite)
-      } else {
-        var url = new URL(inputBox.value)
-      }
-
-      if (url !== undefined) {
-        console.log("Url before wrangle is", url.href)
-        browser.runtime.sendMessage({ cmd: "wrangle-page", url: url.href })
-      }
-
+      var url = getTargetSite()
+      console.log("Url before wrangle is", url.href)
+      if (url) browser.runtime.sendMessage({ cmd: "wrangle-page", url: url.href })
       break
     case "JSON-to-HSC":
       browser.runtime.sendMessage({ cmd: "JSON-to-HSC" })
       break
     case "addSite":
-      addSite()
+      browser.runtime.sendMessage({ cmd: "addSite", url: url.href })
       break
     case "removeSite":
-      var inputBox = document.getElementById("sitesInput");
       try {
-        var url = new URL(inputBox.value)
+        var url = new URL(sitesInput.value)
         var index = sites.indexOf(url.href)
         if (index > -1) {
           sites.splice(index, 1)
@@ -80,8 +84,7 @@ document.addEventListener("click", (e) => {
       }
       break
     case "defaultSite":
-      var inputBox = document.getElementById("sitesInput");
-      var url = new URL(inputBox.value)
+      var url = new URL(sitesInput.value)
 
       if (defaultSite !== url.href) {
         defaultSite = url.href
